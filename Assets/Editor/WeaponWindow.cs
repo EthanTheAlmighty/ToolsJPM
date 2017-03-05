@@ -11,8 +11,14 @@ public class WeaponWindow : EditorWindow {
     public List<string> weaponNameList = new List<string>();
     public string[] weaponNameArray;
 
+    //storing selections from the selection grids
+    string[] effectTypes = { "Damage", "Heal", "Debuff" };
+    string[] weaponType = { "Primary", "Secondary" };
+    int effectSelection = 0;
+    int typeSelection = 0;
+
     //toggle for which type of gun it is
-    WeaponType myType;
+    bool myType1, myType2, myType3;
     string myName;
     int myDamage;
     int myAmmo;
@@ -44,18 +50,43 @@ public class WeaponWindow : EditorWindow {
 
     void OnGUI()
     {
-        switch(myType)
+        EditorGUILayout.Space();
+        EditorGUILayout.Space();
+
+        myName = EditorGUILayout.TextField("Weapon Name: ", myName);
+
+        EditorGUILayout.Space(); 
+
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("Weapon Type: ", GUILayout.Width(90));
+        typeSelection = GUILayout.SelectionGrid(typeSelection, weaponType, 2);
+        EditorGUILayout.EndHorizontal();
+
+        EditorGUILayout.Space();
+
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("Effect Type: ", GUILayout.Width(90));
+        effectSelection = GUILayout.SelectionGrid(effectSelection, effectTypes, 3);
+        EditorGUILayout.EndHorizontal();
+
+        switch (effectSelection)
         {
-            case WeaponType.DAMAGE:
-                //DrawDamage
+            case 0:
+                //damage
                 break;
-            case WeaponType.DEBUFF:
-                //DrawDebuff
+            case 1:
+                //heal
                 break;
-            case WeaponType.HEAL:
-                //DrawHeal
+            case 2:
+                //debuff
                 break;
         }
+
+        //everything else
+        myAmmo = EditorGUILayout.IntSlider("Clip Size: ", myAmmo, 10, 20);
+        myAccuracy = EditorGUILayout.Slider("Accuracy: ", myAccuracy, .65f, 1f);
+        myDropOff = EditorGUILayout.Slider("Accuracy Dropoff: ", myDropOff, .65f, 1f);
+        myMaxRange = EditorGUILayout.IntSlider("Max Range: ", myMaxRange, 10, 20);
     }
 
     private void GetWeapons()
@@ -78,7 +109,7 @@ public class WeaponWindow : EditorWindow {
 
     void NewWeapon()
     {
-        myType = WeaponType.DAMAGE;
+        //myType = WeaponType.DAMAGE;
         myName = string.Empty;
         myDamage = 30;
         myAmmo = 1;
@@ -92,28 +123,28 @@ public class WeaponWindow : EditorWindow {
 
     void CurrentWeapon()
     {
-        myType = weaponList[currentRoyce - 1].usage;
+        //myType = weaponList[currentRoyce - 1].usage;
         myName = weaponList[currentRoyce - 1].weaponName;
-        myDamage = weaponList[currentRoyce - 1].damage;
+        myDamage = weaponList[currentRoyce - 1].damageAmount;
         myAmmo = weaponList[currentRoyce - 1].ammo;
         myAccuracy = weaponList[currentRoyce - 1].acc;
         myDropOff = weaponList[currentRoyce - 1].dropOff;
         myMaxRange = weaponList[currentRoyce - 1].MaxRange;
-        myHeal = weaponList[currentRoyce - 1].heal;
+        myHeal = weaponList[currentRoyce - 1].healAmount;
         myDebuffTime = weaponList[currentRoyce - 1].debuffTime;
         myDebuffAmount = weaponList[currentRoyce - 1].debuffAmount;
     }
 
     void SaveWeapon()
     {
-        weaponList[currentRoyce - 1].usage = myType;
+        //weaponList[currentRoyce - 1].usage = myType;
         weaponList[currentRoyce - 1].weaponName = myName;
-        weaponList[currentRoyce - 1].damage = myDamage;
+        weaponList[currentRoyce - 1].damageAmount = myDamage;
         weaponList[currentRoyce - 1].ammo = myAmmo;
         weaponList[currentRoyce - 1].acc = myAccuracy;
         weaponList[currentRoyce - 1].dropOff = myDropOff;
         weaponList[currentRoyce - 1].MaxRange = myMaxRange;
-        weaponList[currentRoyce - 1].heal = myHeal;
+        weaponList[currentRoyce - 1].healAmount = myHeal;
         weaponList[currentRoyce - 1].debuffTime = myDebuffTime;
         weaponList[currentRoyce - 1].debuffAmount = myDebuffAmount;
     }
@@ -138,14 +169,14 @@ public class WeaponWindow : EditorWindow {
         Weapons SuperWeapon = ScriptableObject.CreateInstance<Weapons>();
 
         //fill stats
-        SuperWeapon.usage = myType;
+        //SuperWeapon.usage = myType;
         SuperWeapon.weaponName = myName;
-        SuperWeapon.damage = myDamage;
+        SuperWeapon.damageAmount = myDamage;
         SuperWeapon.ammo = myAmmo;
         SuperWeapon.acc = myAccuracy;
         SuperWeapon.dropOff = myDropOff;
         SuperWeapon.MaxRange = myMaxRange;
-        SuperWeapon.heal = myHeal;
+        SuperWeapon.healAmount = myHeal;
         SuperWeapon.debuffTime = myDebuffTime;
         SuperWeapon.debuffAmount = myDebuffAmount;
 

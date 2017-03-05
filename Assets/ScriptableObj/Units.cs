@@ -9,4 +9,6 @@ public class Units : ScriptableObject {
     public int health;
     public int AP;
     public float armor;
+    public bool isFujiwara;
+    public float damageModifier;
 }

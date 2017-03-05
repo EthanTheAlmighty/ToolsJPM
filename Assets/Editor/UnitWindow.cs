@@ -16,6 +16,8 @@ public class UnitWindow : EditorWindow {
     int myHealth;
     int myAP;
     float myArmor;
+    bool myFuji;
+    float mydamageMod;
 
     bool nameFlag;
     bool existingFlag;
@@ -60,6 +62,10 @@ public class UnitWindow : EditorWindow {
         myHealth = EditorGUILayout.IntSlider("Health: ", myHealth, 30, 70);
         myAP = EditorGUILayout.IntSlider("Action Points: ", myAP, 2, 4);
         myArmor = EditorGUILayout.Slider("Armor: ", myArmor, 0.1f, 0.25f);
+        myFuji = EditorGUILayout.Toggle("Fujiwara Unit: ", myFuji);
+        GUI.enabled = myFuji;
+        mydamageMod = EditorGUILayout.Slider("Damage Modifier: ", mydamageMod, 1.1f, 1.3f);
+        GUI.enabled = true;
 
         EditorGUILayout.Space();
 
@@ -119,7 +125,7 @@ public class UnitWindow : EditorWindow {
             unitNameList.Add(enemyInst.unitName);
             unitList.Add(enemyInst);
         }
-        unitNameList.Insert(0, "new");
+        unitNameList.Insert(0, "New");
         unitNameArray = unitNameList.ToArray();
     }
 
@@ -130,6 +136,8 @@ public class UnitWindow : EditorWindow {
         myHealth = 30;
         myAP = 2;
         myArmor = 0.1f;
+        myFuji = false;
+        mydamageMod = 1.1f;
     }
 
     void CurrentUnit()
@@ -139,6 +147,8 @@ public class UnitWindow : EditorWindow {
         myHealth = unitList[currentRoyce - 1].health;
         myAP = unitList[currentRoyce - 1].AP;
         myArmor = unitList[currentRoyce - 1].armor;
+        myFuji = unitList[currentRoyce - 1].isFujiwara;
+        mydamageMod = unitList[currentRoyce - 1].damageModifier;
     }
 
     void SaveUnit()
@@ -148,6 +158,8 @@ public class UnitWindow : EditorWindow {
         unitList[currentRoyce - 1].health = myHealth;
         unitList[currentRoyce - 1].AP = myAP;
         unitList[currentRoyce - 1].armor = myArmor;
+        unitList[currentRoyce - 1].isFujiwara = myFuji;
+        unitList[currentRoyce - 1].damageModifier = (myFuji) ? mydamageMod : 1.0f;
 
         EditorUtility.SetDirty(unitList[currentRoyce - 1]);
         AssetDatabase.SaveAssets();
@@ -183,8 +195,10 @@ public class UnitWindow : EditorWindow {
         myUnit.health = myHealth;
         myUnit.AP = myAP;
         myUnit.armor = myArmor;
+        myUnit.isFujiwara = myFuji;
+        myUnit.damageModifier = (myUnit.isFujiwara) ? mydamageMod : 1.0f;
 
-        AssetDatabase.CreateAsset(myUnit, "Assets/Resources/Data/EnemyData/" + myUnit.unitName.Replace(" ", "_") + ".asset");
+        AssetDatabase.CreateAsset(myUnit, "Assets/Resources/Data/UnitData/" + myUnit.unitName.Replace(" ", "_") + ".asset");
         SwitchFlags();
         GetUnits();
 
