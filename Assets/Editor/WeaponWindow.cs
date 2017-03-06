@@ -73,20 +73,64 @@ public class WeaponWindow : EditorWindow {
         {
             case 0:
                 //damage
+                myDamage = EditorGUILayout.IntSlider("Amount: ", myDamage, 5, 20);
+                GUI.enabled = false;
+                myDebuffTime = EditorGUILayout.IntSlider("Time: ", myDebuffTime, 2, 3);
+                GUI.enabled = true;
                 break;
             case 1:
                 //heal
+                myHeal = EditorGUILayout.IntSlider("Amount: ", myHeal, 6, 17);
+                GUI.enabled = false;
+                myDebuffTime = EditorGUILayout.IntSlider("Time: ", myDebuffTime, 2, 3);
+                GUI.enabled = true;
                 break;
             case 2:
                 //debuff
+                myDebuffAmount = EditorGUILayout.Slider("Amount: ", myDebuffAmount, 0.15f, 0.4f);
+                myDebuffTime = EditorGUILayout.IntSlider("Time: ", myDebuffTime, 2, 3);
                 break;
         }
 
         //everything else
-        myAmmo = EditorGUILayout.IntSlider("Clip Size: ", myAmmo, 10, 20);
-        myAccuracy = EditorGUILayout.Slider("Accuracy: ", myAccuracy, .65f, 1f);
+        myAmmo = EditorGUILayout.IntSlider("Clip Size: ", myAmmo, 1, 15);
+        myAccuracy = EditorGUILayout.Slider("Accuracy: ", myAccuracy, .02f, 1f);
         myDropOff = EditorGUILayout.Slider("Accuracy Dropoff: ", myDropOff, .65f, 1f);
-        myMaxRange = EditorGUILayout.IntSlider("Max Range: ", myMaxRange, 10, 20);
+        myMaxRange = EditorGUILayout.IntSlider("Max Range: ", myMaxRange, 1, 20);
+
+        EditorGUILayout.Space();
+        EditorGUILayout.Space();
+
+        if (currentRoyce == 0)
+        {
+            if (GUILayout.Button("Create"))
+            {
+                SwitchFlags();
+                CreateWeapon();
+            }
+        }
+        else
+        {
+            if (GUILayout.Button("Save"))
+            {
+                SwitchFlags();
+                SaveWeapon();
+            }
+        }
+
+        if (currentRoyce != lastRoyce)
+        {
+            lastRoyce = currentRoyce;
+            switch (currentRoyce)
+            {
+                case 0:
+                    NewWeapon();
+                    break;
+                default:
+                    CurrentWeapon();
+                    break;
+            }
+        }
     }
 
     private void GetWeapons()
@@ -147,6 +191,9 @@ public class WeaponWindow : EditorWindow {
         weaponList[currentRoyce - 1].healAmount = myHeal;
         weaponList[currentRoyce - 1].debuffTime = myDebuffTime;
         weaponList[currentRoyce - 1].debuffAmount = myDebuffAmount;
+
+        EditorUtility.SetDirty(weaponList[currentRoyce - 1]);
+        AssetDatabase.SaveAssets();
     }
 
     bool CreateWeapon()
