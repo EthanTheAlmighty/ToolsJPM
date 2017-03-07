@@ -15,7 +15,7 @@ public class WeaponWindow : EditorWindow {
     string[] effectTypes = { "Damage", "Heal", "Debuff" };
     string[] weaponType = { "Primary", "Secondary" };
     int effectSelection = 0;
-    int typeSelection = 0;
+    int weaponEffect = 0;
 
     //toggle for which type of gun it is
     bool myType1, myType2, myType3;
@@ -50,6 +50,8 @@ public class WeaponWindow : EditorWindow {
 
     void OnGUI()
     {
+        currentRoyce = EditorGUILayout.Popup(currentRoyce, weaponNameArray);
+
         EditorGUILayout.Space();
         EditorGUILayout.Space();
 
@@ -59,7 +61,7 @@ public class WeaponWindow : EditorWindow {
 
         EditorGUILayout.BeginHorizontal();
         EditorGUILayout.LabelField("Weapon Type: ", GUILayout.Width(90));
-        typeSelection = GUILayout.SelectionGrid(typeSelection, weaponType, 2);
+        weaponEffect = GUILayout.SelectionGrid(weaponEffect, weaponType, 2);
         EditorGUILayout.EndHorizontal();
 
         EditorGUILayout.Space();
@@ -94,8 +96,8 @@ public class WeaponWindow : EditorWindow {
 
         //everything else
         myAmmo = EditorGUILayout.IntSlider("Clip Size: ", myAmmo, 1, 15);
-        myAccuracy = EditorGUILayout.Slider("Accuracy: ", myAccuracy, .02f, 1f);
-        myDropOff = EditorGUILayout.Slider("Accuracy Dropoff: ", myDropOff, .65f, 1f);
+        myAccuracy = EditorGUILayout.Slider("Accuracy: ", myAccuracy, .6f, 1f);
+        myDropOff = EditorGUILayout.Slider("Accuracy Dropoff: ", myDropOff, .02f, 1f);
         myMaxRange = EditorGUILayout.IntSlider("Max Range: ", myMaxRange, 1, 20);
 
         EditorGUILayout.Space();
@@ -139,7 +141,7 @@ public class WeaponWindow : EditorWindow {
         weaponList.Clear();
         weaponNameList.Clear();
 
-        string[] guids = AssetDatabase.FindAssets("t:Weapons");
+        string[] guids = AssetDatabase.FindAssets("t:PrimaryWeapon t:SecondaryWeapon");
         foreach (string guid in guids)
         {
             string RoyceString = AssetDatabase.GUIDToAssetPath(guid);
@@ -154,8 +156,9 @@ public class WeaponWindow : EditorWindow {
     void NewWeapon()
     {
         //myType = WeaponType.DAMAGE;
+        weaponEffect = 0;
         myName = string.Empty;
-        myDamage = 30;
+        myDamage = 5;
         myAmmo = 1;
         myAccuracy = .6f;
         myDropOff = .02f;
@@ -168,6 +171,7 @@ public class WeaponWindow : EditorWindow {
     void CurrentWeapon()
     {
         //myType = weaponList[currentRoyce - 1].usage;
+        weaponEffect = weaponList[currentRoyce - 1].weaponEffect;
         myName = weaponList[currentRoyce - 1].weaponName;
         myDamage = weaponList[currentRoyce - 1].damageAmount;
         myAmmo = weaponList[currentRoyce - 1].ammo;
@@ -182,6 +186,7 @@ public class WeaponWindow : EditorWindow {
     void SaveWeapon()
     {
         //weaponList[currentRoyce - 1].usage = myType;
+        weaponList[currentRoyce - 1].weaponEffect = weaponEffect;
         weaponList[currentRoyce - 1].weaponName = myName;
         weaponList[currentRoyce - 1].damageAmount = myDamage;
         weaponList[currentRoyce - 1].ammo = myAmmo;
@@ -213,21 +218,47 @@ public class WeaponWindow : EditorWindow {
             return false;
         }
 
-        Weapons SuperWeapon = ScriptableObject.CreateInstance<Weapons>();
+        if(weaponEffect == 0)
+        {
+            PrimaryWeapon SuperWeapon = ScriptableObject.CreateInstance<PrimaryWeapon>();
 
-        //fill stats
-        //SuperWeapon.usage = myType;
-        SuperWeapon.weaponName = myName;
-        SuperWeapon.damageAmount = myDamage;
-        SuperWeapon.ammo = myAmmo;
-        SuperWeapon.acc = myAccuracy;
-        SuperWeapon.dropOff = myDropOff;
-        SuperWeapon.MaxRange = myMaxRange;
-        SuperWeapon.healAmount = myHeal;
-        SuperWeapon.debuffTime = myDebuffTime;
-        SuperWeapon.debuffAmount = myDebuffAmount;
+            //fill stats
+            //SuperWeapon.usage = myType;
+            SuperWeapon.weaponEffect = weaponEffect;
+            SuperWeapon.weaponName = myName;
+            SuperWeapon.damageAmount = myDamage;
+            SuperWeapon.ammo = myAmmo;
+            SuperWeapon.acc = myAccuracy;
+            SuperWeapon.dropOff = myDropOff;
+            SuperWeapon.MaxRange = myMaxRange;
+            SuperWeapon.healAmount = myHeal;
+            SuperWeapon.debuffTime = myDebuffTime;
+            SuperWeapon.debuffAmount = myDebuffAmount;
 
-        AssetDatabase.CreateAsset(SuperWeapon, "Assets/Resources/Data/WeaponData/" + SuperWeapon.weaponName.Replace(" ", "_") + ".asset");
+            AssetDatabase.CreateAsset(SuperWeapon, "Assets/Resources/Data/WeaponData/Primary/" + SuperWeapon.weaponName.Replace(" ", "_") + ".asset");
+        }
+        else if(weaponEffect ==1)
+        {
+            SecondaryWeapon SuperWeapon = ScriptableObject.CreateInstance<SecondaryWeapon>();
+
+            //fill stats
+            //SuperWeapon.usage = myType;
+            SuperWeapon.weaponEffect = weaponEffect;
+            SuperWeapon.weaponName = myName;
+            SuperWeapon.damageAmount = myDamage;
+            SuperWeapon.ammo = myAmmo;
+            SuperWeapon.acc = myAccuracy;
+            SuperWeapon.dropOff = myDropOff;
+            SuperWeapon.MaxRange = myMaxRange;
+            SuperWeapon.healAmount = myHeal;
+            SuperWeapon.debuffTime = myDebuffTime;
+            SuperWeapon.debuffAmount = myDebuffAmount;
+
+            AssetDatabase.CreateAsset(SuperWeapon, "Assets/Resources/Data/WeaponData/Secondary/" + SuperWeapon.weaponName.Replace(" ", "_") + ".asset");
+        }
+        
+
+        
         SwitchFlags();
         GetWeapons();
 

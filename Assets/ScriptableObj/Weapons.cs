@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Weapons : ScriptableObject {
+    public int weaponEffect;
     public bool damage, heal, debuff;
     public string weaponName;
     public int damageAmount;
