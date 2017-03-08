@@ -98,14 +98,14 @@ public class UnitWindow : EditorWindow {
         if (currentRoyce == 0)
         {
             GUI.color = new Color(.235f, .588f, .392f);
-            if (GUILayout.Button("Create", GUILayout.Width(100))){
+            if (GUILayout.Button("Create", GUILayout.Width(100), GUILayout.Height(30))){
                 SwitchFlags();
                 CreateUnit();}
         }
         else
         {
             GUI.color = new Color(.12f, .588f, .86f);
-            if (GUILayout.Button("Save", GUILayout.Width(100))){
+            if (GUILayout.Button("Save", GUILayout.Width(100), GUILayout.Height(30))){
                 SwitchFlags();
                 SaveUnit();}
         }
