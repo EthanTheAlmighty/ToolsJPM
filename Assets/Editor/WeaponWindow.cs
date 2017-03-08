@@ -40,6 +40,8 @@ public class WeaponWindow : EditorWindow {
     static void WindowOpener()
     {
         EditorWindow.GetWindow<WeaponWindow>("Weapon Creator");
+        EditorWindow.GetWindow<WeaponWindow>().minSize = new Vector2(325, 300);
+        EditorWindow.GetWindow<WeaponWindow>().maxSize = new Vector2(350, 325);
     }
 
     void Awake()
@@ -103,9 +105,14 @@ public class WeaponWindow : EditorWindow {
         EditorGUILayout.Space();
         EditorGUILayout.Space();
 
+        EditorGUILayout.BeginHorizontal();
+
+        GUILayout.FlexibleSpace();
+
         if (currentRoyce == 0)
         {
-            if (GUILayout.Button("Create"))
+            GUI.color = new Color(.235f, .588f, .392f);
+            if (GUILayout.Button("Create", GUILayout.Width(100), GUILayout.Height(30)))
             {
                 SwitchFlags();
                 CreateWeapon();
@@ -113,12 +120,18 @@ public class WeaponWindow : EditorWindow {
         }
         else
         {
-            if (GUILayout.Button("Save"))
+            GUI.color = new Color(.12f, .588f, .86f);
+            if (GUILayout.Button("Save", GUILayout.Width(100), GUILayout.Height(30)))
             {
                 SwitchFlags();
                 SaveWeapon();
             }
         }
+        GUI.color = Color.white;
+
+        GUILayout.FlexibleSpace();
+
+        EditorGUILayout.EndHorizontal();
 
         if (currentRoyce != lastRoyce)
         {

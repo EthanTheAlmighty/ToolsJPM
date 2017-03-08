@@ -11,4 +11,6 @@ public class Units : ScriptableObject {
     public float armor;
     public bool isFujiwara;
     public float damageModifier;
+    public PrimaryWeapon primary;
+    public SecondaryWeapon second;
 }

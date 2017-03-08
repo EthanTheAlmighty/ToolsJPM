@@ -18,19 +18,27 @@ public class UnitWindow : EditorWindow {
     float myArmor;
     bool myFuji;
     float mydamageMod;
+    PrimaryWeapon myPrimary;
+    SecondaryWeapon mySecondary;
 
     bool nameFlag;
     bool existingFlag;
     bool noSpriteFlag;
+    bool primaryFlag;
+    bool secondFlag;
 
     //choices for if it's a new enemy or a stored one
     public int currentRoyce = 0;
     int lastRoyce = 0;
 
+    //current choice of 
+
     [MenuItem("Junk Paper Militia/Unit Creator %u")]
     static void WindowOpener()
     {
         EditorWindow.GetWindow<UnitWindow>("Unit Creator");
+        EditorWindow.GetWindow<UnitWindow>().minSize = new Vector2(375, 350);
+        EditorWindow.GetWindow<UnitWindow>().maxSize = new Vector2(400, 425);
     }
 
     void Awake()
@@ -66,21 +74,46 @@ public class UnitWindow : EditorWindow {
         GUI.enabled = myFuji;
         mydamageMod = EditorGUILayout.Slider("Damage Modifier: ", mydamageMod, 1.1f, 1.3f);
         GUI.enabled = true;
+        
+        EditorGUILayout.Space();
+        //primary
+        //primaryChoice = EditorGUILayout.Popup(primaryChoice, primaryNameArray);
+        myPrimary = EditorGUILayout.ObjectField("Primary Weapon: ", myPrimary, typeof(PrimaryWeapon), false) as PrimaryWeapon;
 
         EditorGUILayout.Space();
+        //secondary
+        mySecondary = EditorGUILayout.ObjectField("Secondary Weapon: ", mySecondary, typeof(SecondaryWeapon), false) as SecondaryWeapon;
+
+        EditorGUILayout.Space();
+        EditorGUILayout.Space();
+
+        //GUIStyle centerer = GUI.skin.button;
+        //centerer.alignment = TextAnchor.MiddleCenter;
+        //centerer.fixedWidth = 100;
+
+        EditorGUILayout.BeginHorizontal();
+
+        GUILayout.FlexibleSpace();
 
         if (currentRoyce == 0)
         {
-            if (GUILayout.Button("Create")){
+            GUI.color = new Color(.235f, .588f, .392f);
+            if (GUILayout.Button("Create", GUILayout.Width(100))){
                 SwitchFlags();
                 CreateUnit();}
         }
         else
         {
-            if (GUILayout.Button("Save")){
+            GUI.color = new Color(.12f, .588f, .86f);
+            if (GUILayout.Button("Save", GUILayout.Width(100))){
                 SwitchFlags();
                 SaveUnit();}
         }
+        GUI.color = Color.white;
+
+        GUILayout.FlexibleSpace();
+
+        EditorGUILayout.EndHorizontal();
 
         if (currentRoyce != lastRoyce)
         {
@@ -95,8 +128,12 @@ public class UnitWindow : EditorWindow {
                     break;
             }
         }
-
         //flag errors
+        DrawFlags();
+    }
+
+    void DrawFlags()
+    {
         if (nameFlag)
         {
             EditorGUILayout.HelpBox("Name Can not be blank", MessageType.Warning);
@@ -107,9 +144,18 @@ public class UnitWindow : EditorWindow {
         }
         if (noSpriteFlag)
         {
-            EditorGUILayout.HelpBox("Can't save without a portrait", MessageType.Error);
+            EditorGUILayout.HelpBox("Can't save without a portrait", MessageType.Warning);
+        }
+        if(primaryFlag)
+        {
+            EditorGUILayout.HelpBox("Can't save without a Primary Weapon", MessageType.Warning);
+        }
+        if (secondFlag)
+        {
+            EditorGUILayout.HelpBox("Can't save without a Secondary Weapon", MessageType.Warning);
         }
     }
+
 
     void GetUnits()
     {
@@ -149,6 +195,8 @@ public class UnitWindow : EditorWindow {
         myArmor = unitList[currentRoyce - 1].armor;
         myFuji = unitList[currentRoyce - 1].isFujiwara;
         mydamageMod = unitList[currentRoyce - 1].damageModifier;
+        myPrimary = unitList[currentRoyce - 1].primary;
+        mySecondary = unitList[currentRoyce - 1].second;
     }
 
     void SaveUnit()
@@ -160,6 +208,8 @@ public class UnitWindow : EditorWindow {
         unitList[currentRoyce - 1].armor = myArmor;
         unitList[currentRoyce - 1].isFujiwara = myFuji;
         unitList[currentRoyce - 1].damageModifier = (myFuji) ? mydamageMod : 1.0f;
+        unitList[currentRoyce - 1].primary = myPrimary;
+        unitList[currentRoyce - 1].second = mySecondary;
 
         EditorUtility.SetDirty(unitList[currentRoyce - 1]);
         AssetDatabase.SaveAssets();
@@ -168,24 +218,10 @@ public class UnitWindow : EditorWindow {
     bool CreateUnit()
     {
         SwitchFlags();
-        if (myName == string.Empty)
-        {
-            nameFlag = true;
+        //check if it's savable: needs a portrait, a name, if it exists already,
+        //and if it has a primary and secondary weapon attached
+        if (!CheckSavable())
             return false;
-        }
-        if (myPortrait == null)
-        {
-            noSpriteFlag = true;
-            return false;
-        }
-
-        //check if guy already exists
-        string[] assetString = AssetDatabase.FindAssets(myName.Replace(" ", "_"));
-        if (assetString.Length > 0)
-        {
-            existingFlag = true;
-            return false;
-        }
 
         Units myUnit = ScriptableObject.CreateInstance<Units>();
 
@@ -213,10 +249,48 @@ public class UnitWindow : EditorWindow {
         return true;
     }
 
+    bool CheckSavable()
+    {
+        if (myName == string.Empty)
+        {
+            nameFlag = true;
+            return false;
+        }
+        if (myPortrait == null)
+        {
+            noSpriteFlag = true;
+            return false;
+        }
+
+        //check if guy already exists
+        string[] assetString = AssetDatabase.FindAssets(myName.Replace(" ", "_"));
+        if (assetString.Length > 0)
+        {
+            existingFlag = true;
+            return false;
+        }
+
+        if(myPrimary == null)
+        {
+            primaryFlag = true;
+            return false;
+        }
+        if(mySecondary = null)
+        {
+            secondFlag = true;
+            return false;
+        }
+
+        return true;
+    }
+
+    //resets all of the flags on attempt to resave or recreate unit
     void SwitchFlags()
     {
         nameFlag = false;
         existingFlag = false;
         noSpriteFlag = false;
+        primaryFlag = false;
+        secondFlag = false;
     }
 }
